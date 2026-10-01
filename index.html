@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Study Bubble</title>
+<style>
+:root{--blue:#2f9bf4;--purple:#8b5cf6;--orange:#ff8a3d;--green:#35c978;--ink:#10213b;--bg:#f8fbff}
+*{box-sizing:border-box}body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:#eef3f8;color:var(--ink)}
+.app{max-width:430px;min-height:100vh;margin:auto;background:var(--bg);position:relative;padding-bottom:84px;overflow:hidden}
+.top{padding:28px 22px 10px;background:linear-gradient(180deg,#fff 0%,#f8fbff 100%);position:relative}
+.logo{display:flex;align-items:center;gap:9px;font-size:25px;font-weight:800}.bubble{width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,#5ab7ff,#8c74ff);position:relative}.bubble:after{content:"";position:absolute;width:12px;height:12px;border-radius:50%;background:#fff;opacity:.55;left:7px;top:7px}
+.sub{margin-top:5px;color:#70809a;font-size:14px}.streak{margin-top:15px;color:#e87919;font-weight:700;background:#fff1e7;display:inline-block;padding:8px 12px;border-radius:18px;font-size:13px}
+.screen{padding:10px 18px}.hero{padding:18px 4px}.hero h1{font-size:27px;margin:0 0 5px}.hero p{margin:0;color:#70809a}
+.card{border-radius:20px;padding:17px;margin:12px 0;box-shadow:0 6px 22px #183b6512;border:1px solid #edf1f7;background:#fff}
+.action{display:flex;align-items:center;gap:13px;cursor:pointer}.icon{width:45px;height:45px;border-radius:15px;display:grid;place-items:center;font-size:21px;color:#fff;font-weight:800}.blue{background:#53aaf5}.coral{background:#ff8875}.purple{background:#9b72ed}.green{background:#42c979}.yellow{background:#f5bf34}.action b{font-size:16px}.action small{display:block;color:#8290a4;margin-top:3px}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}.mini{padding:14px 7px;text-align:center;background:#fff;border-radius:18px;box-shadow:0 5px 18px #183b6510;cursor:pointer}.mini .icon{margin:auto;width:39px;height:39px}.mini span{display:block;font-size:12px;font-weight:700;margin-top:7px}
+.section-title{display:flex;justify-content:space-between;align-items:center;margin:20px 3px 9px}.section-title b{font-size:16px}.stat{display:flex;justify-content:space-between;padding:13px 2px;border-bottom:1px solid #edf1f5}.stat:last-child{border:0}.muted{color:#7a889c}.btn{border:0;border-radius:15px;padding:14px 18px;font-size:15px;font-weight:800;cursor:pointer;background:var(--blue);color:white;width:100%;margin-top:10px}.btn.secondary{background:#eaf4ff;color:#238ce8}.btn.gray{background:#eef2f6;color:#526278}
+input,textarea,select{width:100%;padding:14px;border:1px solid #dce5ef;border-radius:14px;font:inherit;background:#fff;outline:none}textarea{min-height:130px;resize:vertical}.label{font-weight:750;margin:10px 0 7px;display:block}
+.flash{min-height:270px;display:flex;align-items:center;justify-content:center;text-align:center;font-size:25px;font-weight:800;padding:25px}.flash small{display:block;font-size:13px;color:#8290a4;font-weight:500;margin-top:15px}.flash-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px}.wrong{background:#ff8c79}.right{background:#52a8f5}
+.progressbar{height:8px;background:#e6edf5;border-radius:10px;overflow:hidden}.progressbar i{display:block;height:100%;background:var(--blue);width:25%}
+.quiz-q{font-size:21px;font-weight:800;line-height:1.25}.choice{width:100%;text-align:left;background:#fff;color:var(--ink);border:1px solid #dfe7f0;margin:7px 0}.choice.correct{background:#dff8ea;border-color:#53c989}.choice.wrong{background:#ffe4df;border-color:#ff8c79;color:#6d2a20}
+.result{text-align:center}.score{font-size:52px;font-weight:900;color:#278fe8;margin:15px 0 5px}
+.bottom{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:min(430px,100%);height:74px;background:#fff;border-top:1px solid #e6ebf1;display:grid;grid-template-columns:repeat(4,1fr);z-index:5;padding-bottom:env(safe-area-inset-bottom)}.nav{border:0;background:none;color:#8290a4;font-size:11px;font-weight:700;cursor:pointer}.nav.active{color:#238fe9}.nav div{font-size:21px;margin-bottom:3px}
+.back{border:0;background:none;font-size:15px;color:#238fe9;font-weight:750;padding:5px 0}.hidden{display:none}.pill{display:inline-block;padding:6px 10px;border-radius:20px;background:#eef6ff;color:#248fe7;font-size:12px;font-weight:750}
+.notice{font-size:12px;color:#8290a4;line-height:1.45;background:#f4f7fa;padding:11px;border-radius:12px;margin-top:12px}
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="top">
+    <div class="logo"><span class="bubble"></span>Study Bubble</div>
+    <div class="sub" id="headerSub">What are we studying?</div>
+    <div class="streak">🔥 <span id="streak">0</span>-day streak</div>
+  </header>
+
+  <main id="home" class="screen">
+    <div class="hero"><h1>Ready to study?</h1><p>Turn a topic into a quick study session.</p></div>
+    <div class="card action" onclick="show('topic')"><div class="icon blue">✎</div><div><b>Enter Topic</b><small>Type any topic to start</small></div><span>›</span></div>
+    <div class="card action" onclick="show('scan')"><div class="icon coral">⌾</div><div><b>Scan Notes</b><small>Upload a photo of your notes</small></div><span>›</span></div>
+    <div class="grid">
+      <div class="mini" onclick="show('flashcards')"><div class="icon purple">▣</div><span>Flashcards</span></div>
+      <div class="mini" onclick="startQuiz()"><div class="icon green">✓</div><span>Practice Quiz</span></div>
+      <div class="mini" onclick="show('progress')"><div class="icon yellow">▥</div><span>Progress</span></div>
+    </div>
+    <div class="section-title"><b>Your Progress</b></div>
+    <div class="card">
+      <div class="stat"><span>📊 Quiz average</span><b id="avg">—</b></div>
+      <div class="stat"><span>☷ Questions answered</span><b id="answered">0</b></div>
+      <div class="stat"><span>⚠️ Needs review</span><b id="review">0 topics</b></div>
+    </div>
+    <div class="notice">MVP demo: study content is generated from built-in examples. AI and real note OCR can be connected after the app flow is working.</div>
+  </main>
+
+  <main id="topic" class="screen hidden">
+    <button class="back" onclick="show('home')">‹ Back</button>
+    <div class="hero"><h1>What are we studying?</h1><p>Try “photosynthesis” or “quadratic functions.”</p></div>
+    <label class="label">Topic</label><input id="topicInput" placeholder="e.g. Photosynthesis">
+    <button class="btn" onclick="generateTopic()">Create Study Session</button>
+    <div class="notice">For this first prototype, try Photosynthesis or Quadratic Functions.</div>
+  </main>
+
+  <main id="scan" class="screen hidden">
+    <button class="back" onclick="show('home')">‹ Back</button>
+    <div class="hero"><h1>Scan Notes</h1><p>Take or choose a photo of your notes, then create a study session.</p></div>
+    <div class="card" style="text-align:center">
+      <input type="file" accept="image/*" capture="environment" id="photo" onchange="previewPhoto(event)">
+      <div id="photoPreview" class="notice">📸 No photo selected yet.</div>
+    </div>
+    <label class="label">Notes text <span class="muted">(optional for this prototype)</span></label>
+    <textarea id="notesInput" placeholder="Paste your notes here..."></textarea>
+    <button class="btn" onclick="generateFromNotes()">Create Study Session</button>
+    <button class="btn secondary" onclick="clearScan()">Clear</button>
+    <div id="scanStatus" class="notice">In the MVP, pasted notes use the sample study generator. Real OCR + AI comes next.</div>
+  </main>
+
+  <main id="session" class="screen hidden">
+    <button class="back" onclick="show('home')">‹ Back</button>
+    <div class="hero"><h1 id="sessionTitle">Study Session</h1><p id="sessionDesc">Choose how you want to study.</p></div>
+    <div class="card action" onclick="show('flashcards')"><div class="icon purple">▣</div><div><b>Flashcards</b><small>Review key ideas</small></div><span>›</span></div>
+    <div class="card action" onclick="startQuiz()"><div class="icon green">✓</div><div><b>Practice Quiz</b><small>Test what you know</small></div><span>›</span></div>
+    <button class="btn secondary" onclick="show('home')">Back to Home</button>
+  </main>
+
+  <main id="flashcards" class="screen hidden">
+    <button class="back" onclick="show('home')">‹ Back</button>
+    <div class="section-title"><b>Flashcards</b><span class="pill" id="fcCount">1 of 5</span></div>
+    <div class="progressbar"><i id="fcBar"></i></div>
+    <div class="card flash" onclick="flipCard()"><div id="fcText"></div></div>
+    <div class="flash-actions"><button class="btn wrong" onclick="rateCard(false)">✕ Didn't know</button><button class="btn right" onclick="rateCard(true)">✓ Knew it</button></div>
+  </main>
+
+  <main id="quiz" class="screen hidden">
+    <button class="back" onclick="show('home')">‹ Back</button>
+    <div class="section-title"><b>Practice Quiz</b><span class="pill" id="qCount">1 / 5</span></div>
+    <div class="progressbar"><i id="qBar"></i></div>
+    <div class="card"><div class="quiz-q" id="question"></div><div id="choices"></div></div>
+  </main>
+
+  <main id="results" class="screen hidden">
+    <button class="back" onclick="show('home')">‹ Back</button>
+    <div class="card result"><div style="font-size:40px">🎉</div><h1>Quiz Results</h1><div class="score" id="score">0/5</div><p class="muted" id="resultText"></p></div>
+    <div class="section-title"><b>Review</b></div>
+    <div class="card"><div class="stat"><span>Topic</span><b id="resultTopic">—</b></div><div class="stat"><span>Correct</span><b id="correctStat">0</b></div><div class="stat"><span>Needs review</span><b id="wrongStat">0</b></div></div>
+    <button class="btn" onclick="startQuiz()">Retake Quiz</button>
+    <button class="btn secondary" onclick="show('flashcards')">Review Flashcards</button>
+  </main>
+
+  <main id="progress" class="screen hidden">
+    <button class="back" onclick="show('home')">‹ Back</button>
+    <div class="hero"><h1>Progress</h1><p>Keep going — you're building your knowledge.</p></div>
+    <div class="card"><div class="stat"><span>🔥 Current streak</span><b id="pStreak">0 days</b></div><div class="stat"><span>📊 Quiz average</span><b id="pAvg">—</b></div><div class="stat"><span>☷ Questions answered</span><b id="pAnswered">0</b></div><div class="stat"><span>⚠️ Needs review</span><b id="pReview">0 topics</b></div></div>
+    <button class="btn secondary" onclick="show('home')">Back to Home</button>
+    <button class="btn gray" onclick="resetProgress()">Reset Demo Progress</button>
+  </main>
+
+  <nav class="bottom">
+    <button class="nav active" onclick="show('home')"><div>⌂</div>Home</button>
+    <button class="nav" onclick="show('flashcards')"><div>▣</div>Flashcards</button>
+    <button class="nav" onclick="startQuiz()"><div>✓</div>Quiz</button>
+    <button class="nav" onclick="show('progress')"><div>▥</div>Progress</button>
+  </nav>
+</div>
+
+<script>
+const data={
+ photosynthesis:{
+  explanation:"Photosynthesis is how plants use light energy to make food from water and carbon dioxide. It mainly happens in chloroplasts.",
+  cards:[
+   ["What is photosynthesis?","The process plants use to turn light energy into chemical energy."],
+   ["Where does photosynthesis mainly happen?","In chloroplasts inside plant cells."],
+   ["What gas do plants take in?","Carbon dioxide (CO₂)."],
+   ["What gas is released?","Oxygen (O₂)."],
+   ["What does chlorophyll do?","It absorbs light energy for photosynthesis."]
+  ],
+  quiz:[
+   ["Where does photosynthesis mainly occur?",["Chloroplasts","Nucleus","Ribosomes","Cell wall"],0],
+   ["Which gas do plants take in?",["Oxygen","Carbon dioxide","Nitrogen","Hydrogen"],1],
+   ["What does chlorophyll absorb?",["Sound","Light","Heat only","Water"],1],
+   ["What gas is released during photosynthesis?",["Oxygen","Carbon dioxide","Nitrogen","Helium"],0],
+   ["What is a main product of photosynthesis?",["Glucose","Salt","Protein only","DNA"],0]
+  ]
+ },
+ "quadratic functions":{
+  explanation:"A quadratic function can be written as y = ax² + bx + c. Its graph is a parabola. The sign of a tells whether it opens up or down.",
+  cards:[
+   ["What is the parent quadratic function?","y = x²."],
+   ["What shape is a quadratic graph?","A parabola."],
+   ["What does a > 0 mean?","The parabola opens upward."],
+   ["What does a < 0 mean?","The parabola opens downward."],
+   ["What is the vertex?","The highest or lowest point of a parabola."]
+  ],
+  quiz:[
+   ["What is the parent quadratic function?",["y=x","y=x²","y=|x|","y=1/x"],1],
+   ["What shape is a quadratic graph?",["Line","Circle","Parabola","Triangle"],2],
+   ["If a is negative, the parabola opens...",["Up","Down","Left","Right"],1],
+   ["What is the vertex?",["The middle x-axis","The highest/lowest point","The y-intercept only","A root"],1],
+   ["Which is quadratic?",["y=2x+1","y=x²+3","y=5","y=1/x"],1]
+  ]
+ }
+};
+let state={topic:"photosynthesis",cards:[],fc:0,flipped:false,quiz:[],qi:0,score:0,answered:0,wrong:0};
+let stats=JSON.parse(localStorage.getItem("studyBubbleStats")||'{"answered":0,"score":0,"quizzes":0,"review":0,"streak":0}');
+
+function save(){localStorage.setItem("studyBubbleStats",JSON.stringify(stats));updateStats()}
+function updateStats(){
+ document.getElementById("streak").textContent=stats.streak; document.getElementById("answered").textContent=stats.answered;
+ document.getElementById("review").textContent=stats.review+" topics";
+ document.getElementById("pStreak").textContent=stats.streak+" days"; document.getElementById("pAnswered").textContent=stats.answered; document.getElementById("pReview").textContent=stats.review+" topics";
+ let a=stats.quizzes?Math.round(stats.score/stats.quizzes):0; document.getElementById("avg").textContent=stats.quizzes?a+"%":"—"; document.getElementById("pAvg").textContent=stats.quizzes?a+"%":"—";
+}
+function show(id){
+ document.querySelectorAll("main").forEach(x=>x.classList.add("hidden")); document.getElementById(id).classList.remove("hidden");
+ document.querySelectorAll(".nav").forEach(x=>x.classList.remove("active"));
+ let n={home:0,flashcards:1,quiz:2,progress:3}[id]; if(n!==undefined)document.querySelectorAll(".nav")[n].classList.add("active");
+ updateStats(); window.scrollTo(0,0);
+}
+function normalize(s){return s.toLowerCase().trim()}
+function loadTopic(t){
+ let key=normalize(t), found=data[key];
+ if(!found){found=data.photosynthesis; key="photosynthesis";}
+ state.topic=key; state.cards=found.cards; state.fc=0; state.flipped=false; state.quiz=found.quiz; state.qi=0; state.score=0; state.wrong=0; state.knownCards=0; state.missedCards=0;
+ document.getElementById("headerSub").textContent="Studying: "+key;
+ document.getElementById("sessionTitle").textContent="Study "+titleCase(key);
+ document.getElementById("sessionDesc").textContent="Your study set is ready. Pick flashcards or a practice quiz.";
+ show("session");
+}
+function titleCase(s){return s.replace(/\b\w/g,c=>c.toUpperCase())}
+function generateTopic(){
+ let t=document.getElementById("topicInput").value.trim()||"photosynthesis";
+ loadTopic(t);
+}
+function previewPhoto(event){
+ const file=event.target.files[0], box=document.getElementById("photoPreview");
+ if(!file){box.textContent="📸 No photo selected yet.";return}
+ const url=URL.createObjectURL(file);
+ box.innerHTML=`<img src="${url}" alt="Selected notes" style="max-width:100%;max-height:220px;border-radius:14px"><div style="margin-top:8px">✓ ${file.name}</div>`;
+}
+function generateFromNotes(){
+ const text=document.getElementById("notesInput").value.trim();
+ const photo=document.getElementById("photo").files[0];
+ if(!text && !photo){
+   document.getElementById("scanStatus").textContent="Please choose a photo or paste your notes first.";
+   return;
+ }
+ document.getElementById("scanStatus").textContent="✓ Notes captured. Creating your study session...";
+ setTimeout(()=>loadTopic("photosynthesis"),350);
+}
+function clearScan(){
+ document.getElementById("photo").value="";
+ document.getElementById("notesInput").value="";
+ document.getElementById("photoPreview").textContent="📸 No photo selected yet.";
+ document.getElementById("scanStatus").textContent="Scan cleared.";
+}
+function renderFlash(){
+ let c=state.cards[state.fc]; document.getElementById("fcCount").textContent=(state.fc+1)+" of "+state.cards.length; document.getElementById("fcBar").style.width=((state.fc+1)/state.cards.length*100)+"%";
+ document.getElementById("fcText").innerHTML=state.flipped?c[1]+'<small>Tap to see the question</small>':c[0]+'<small>Tap to flip</small>';
+}
+function flipCard(){state.flipped=!state.flipped;renderFlash()}
+function rateCard(known){
+ if(known){state.knownCards=(state.knownCards||0)+1}else{state.missedCards=(state.missedCards||0)+1}
+ if(state.fc<state.cards.length-1){state.fc++;state.flipped=false;renderFlash()}
+ else{
+   document.getElementById("fcText").innerHTML="🎉 All done!<small>You finished this flashcard set.</small>";
+   document.getElementById("fcCount").textContent="Complete";
+   document.getElementById("fcBar").style.width="100%";
+   setTimeout(()=>show("session"),350);
+ }
+}
+function startQuiz(){state.qi=0;state.score=0;state.wrong=0;if(!state.quiz.length)loadTopic(state.topic);else{renderQuiz();show("quiz")}}
+function renderQuiz(){
+ let q=state.quiz[state.qi];document.getElementById("qCount").textContent=(state.qi+1)+" / "+state.quiz.length;document.getElementById("qBar").style.width=((state.qi+1)/state.quiz.length*100)+"%";document.getElementById("question").textContent=q[0];
+ document.getElementById("choices").innerHTML=q[1].map((c,i)=>`<button class="btn choice" onclick="answer(${i})">${c}</button>`).join("");
+}
+function answer(i){
+ let q=state.quiz[state.qi], buttons=document.querySelectorAll(".choice"); buttons.forEach(b=>b.disabled=true);
+ if(i===q[2]){state.score++;buttons[i].classList.add("correct")}else{state.wrong++;buttons[i].classList.add("wrong");buttons[q[2]].classList.add("correct")}
+ setTimeout(()=>{state.qi++; if(state.qi<state.quiz.length)renderQuiz();else finishQuiz()},550)
+}
+function finishQuiz(){
+ let pct=Math.round(state.score/state.quiz.length*100);
+ stats.answered+=state.quiz.length; stats.score+=pct; stats.quizzes++;
+ if(state.wrong) stats.review++;
+ stats.streak=Math.max(1,stats.streak);
+ save();
+ document.getElementById("score").textContent=state.score+"/"+state.quiz.length;
+ document.getElementById("resultText").textContent=`You got ${state.score} correct and ${state.wrong} wrong.`;
+ document.getElementById("resultTopic").textContent=titleCase(state.topic);
+ document.getElementById("correctStat").textContent=state.score;
+ document.getElementById("wrongStat").textContent=state.wrong;
+ show("results");
+}
+function resetProgress(){
+ stats={answered:0,score:0,quizzes:0,review:0,streak:0};
+ save();
+ alert("Demo progress reset.");
+ show("progress");
+}
+updateStats();
+state.topic="photosynthesis"; state.cards=data.photosynthesis.cards; state.quiz=data.photosynthesis.quiz;
+document.getElementById("headerSub").textContent="What are we studying?";
+show("home");
+</script>
+</body>
+</html>
